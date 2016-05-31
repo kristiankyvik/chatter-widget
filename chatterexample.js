@@ -9,5 +9,3 @@ if (Meteor.isClient) {
     }
   };
 }
-
-

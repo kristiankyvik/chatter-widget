@@ -12,8 +12,8 @@ if (Meteor.isServer) {
 
       users.forEach(function(user) {
         const userId = Accounts.createUser({
-          username: user,
-          password: user
+          username: user.username,
+          password: user.password
         });
 
         const chatterUserId = Chatter.addUser({
