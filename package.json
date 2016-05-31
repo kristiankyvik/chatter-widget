@@ -1,0 +1,27 @@
+{
+  "name": "chatter-widget-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "chatterexample.js",
+  "dependencies": {
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1",
+    "react-addons-pure-render-mixin": "^15.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "chimp-watch": "chimp --ddp=http://localhost:3000 --watch --path=tests",
+    "chimp-test": "chimp --mocha --path=tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kristiankyvik/chatter-example.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kristiankyvik/chatter-example/issues"
+  },
+  "homepage": "https://github.com/kristiankyvik/chatter-example"
+}
