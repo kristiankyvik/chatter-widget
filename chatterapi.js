@@ -1,12 +1,12 @@
 if (Meteor.isServer) {
   // Global API configuration
   var Api = new Restivus({
-    useDefaultAuth: false,
+    useDefaultAuth: true,
     prettyJson: true,
     enableCors: true
   });
 
-  Api.addRoute('setup', {authRequired: false}, {
+  Api.addRoute('setup', {authRequired: true}, {
 
     post: function () {
       check(this.bodyParams, {
@@ -51,7 +51,7 @@ if (Meteor.isServer) {
     }
   });
 
-  Api.addRoute('addRoom', {authRequired: false}, {
+  Api.addRoute('addRoom', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
         name: String,
@@ -65,7 +65,7 @@ if (Meteor.isServer) {
     }
   });
 
-  Api.addRoute('addUser', {authRequired: false}, {
+  Api.addRoute('addUser', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
         username: String,
@@ -86,7 +86,7 @@ if (Meteor.isServer) {
     }
   });
 
-  Api.addRoute('addUserToRoom', {authRequired: false}, {
+  Api.addRoute('addUserToRoom', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
         userId: String,
