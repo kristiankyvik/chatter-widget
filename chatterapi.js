@@ -52,9 +52,8 @@ if (Meteor.isServer) {
   Api.addRoute('addUser', {authRequired: false}, {
     post: function () {
       const userId = Accounts.createUser({
-        email: this.bodyParams.username + "@test.com",
         username: this.bodyParams.username,
-        password: "test"
+        password: this.bodyParams.username
       });
       return Chatter.addUser({
         userId: userId
@@ -71,7 +70,7 @@ if (Meteor.isServer) {
       userId = user._id;
       return Chatter.addUserToRoom({
         userId: userId,
-        roomId: this.bodyParams.room
+        roomId: this.bodyParams.roomId
       });
     }
   });

@@ -101,19 +101,19 @@ This will add the chat widget in the form of an iframe in your site's DOM. In or
 
 ```javascript
   var data = {
-    username: groupName,
-    password: groupName,
-    origin: "chatter-parent",
-    command: "login"
+    "username": "username",
+    "password": "password",
+    "origin": "chatter-parent",
+    "command": "login"
   };
   document.getElementById("chatter-widget").contentWindow.postMessage(data, '*');
 ```
 
 #### Login a user
-```javasscript
+```javascript
   var data = {
-    origin: "chatter-parent",
-    command: "logoff"
+    "origin": "chatter-parent",
+    "command": "logoff"
   };
   document.getElementById("chatter-widget").contentWindow.postMessage(data, '*');
 ```
