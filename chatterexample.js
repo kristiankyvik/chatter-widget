@@ -44,9 +44,8 @@ if (Meteor.isClient) {
 
   window.onmessage = function(e){
     if (e.data.origin == "chatter-parent" && e.data.message == "loginChatter") {
-      //TODO: add a callback when the login fails
+      console.log('check if user has logged in');
       Meteor.loginWithPassword(e.data.username, e.data.password);
-      chatterDispatcher.show();
     } else if (e.data.origin == "chatter-parent" && e.data.message == "logoutChatter") {
       Meteor.logout();
     } else {

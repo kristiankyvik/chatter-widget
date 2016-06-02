@@ -7,7 +7,13 @@ if (Meteor.isServer) {
   });
 
   Api.addRoute('setup', {authRequired: false}, {
+
     post: function () {
+      check(this.bodyParams, {
+        users: [Match.ObjectIncluding({username: String, password: String, userType: Match.Maybe(String)})],
+        rooms: [Match.ObjectIncluding({name: String, users: [String]})]
+      });
+
       const {users, rooms} = this.bodyParams;
 
       users.forEach(function(user) {
@@ -17,7 +23,8 @@ if (Meteor.isServer) {
         });
 
         const chatterUserId = Chatter.addUser({
-          userId: userId
+          userId: userId,
+          userType: user.userType
         });
       });
 
@@ -28,7 +35,11 @@ if (Meteor.isServer) {
         });
 
         room.users.forEach(function(user) {
-          const userId = Meteor.users.findOne({username: user})._id;
+          const userCheck = Meteor.users.findOne({username: user});
+          if (!userCheck) {
+            throw new Meteor.Error("unknown-username", "username does not exist");
+          }
+          const userId = userCheck._id;
           Chatter.addUserToRoom({
             userId: userId,
             roomId: groupRoom
@@ -42,6 +53,11 @@ if (Meteor.isServer) {
 
   Api.addRoute('addRoom', {authRequired: false}, {
     post: function () {
+      check(this.bodyParams, {
+        name: String,
+        description: String
+      });
+
       return Chatter.addRoom({
         name: this.bodyParams.name,
         description: this.bodyParams.description
@@ -51,18 +67,32 @@ if (Meteor.isServer) {
 
   Api.addRoute('addUser', {authRequired: false}, {
     post: function () {
-      const userId = Accounts.createUser({
-        username: this.bodyParams.username,
-        password: this.bodyParams.username
+      check(this.bodyParams, {
+        username: String,
+        password: String,
+        userType: Match.Maybe(String)
       });
+
+      const {username, password, userType} = this.bodyParams;
+      const userId = Accounts.createUser({
+        username,
+        password
+      });
+
       return Chatter.addUser({
-        userId: userId
+        username,
+        userType
       });
     }
   });
 
   Api.addRoute('addUserToRoom', {authRequired: false}, {
     post: function () {
+      check(this.bodyParams, {
+        userId: String,
+        roomId: String
+      });
+
       const user = Meteor.users.findOne({username: this.bodyParams.username});
       if (!user) {
         throw new Meteor.Error("unknown-user", "user cannot be recognized");
