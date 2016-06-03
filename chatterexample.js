@@ -22,6 +22,15 @@ const chatterDispatcher = {
       message: "showChatter"
     };
     window.parent.postMessage(data, '*');
+  },
+
+  hide: function() {
+    console.log("hide being called");
+    const data = {
+      origin: "chatter-child",
+      message: "hideChatter"
+    };
+    window.parent.postMessage(data, '*');
   }
 };
 
@@ -48,6 +57,8 @@ if (Meteor.isClient) {
       Meteor.loginWithPassword(e.data.username, e.data.password);
     } else if (e.data.origin == "chatter-parent" && e.data.message == "logoutChatter") {
       Meteor.logout();
+    } else if (e.data.origin == "chatter-parent" && e.data.message == "minimizeChatter") {
+      console.log("try to minimize chatter");
     } else {
     }
   };
