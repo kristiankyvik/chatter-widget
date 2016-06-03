@@ -15,6 +15,10 @@ if (Meteor.isServer) {
       });
 
       const {users, rooms} = this.bodyParams;
+      const response = {
+        users: [],
+        rooms: []
+      };
 
       users.forEach(function(user) {
         const userId = Accounts.createUser({
@@ -26,6 +30,11 @@ if (Meteor.isServer) {
           userId: userId,
           userType: user.userType
         });
+
+        response.users.push({
+          userId,
+          username: user.username
+        });
       });
 
       rooms.forEach(function(room) {
@@ -33,6 +42,12 @@ if (Meteor.isServer) {
           name: room.name,
           description: "group room"
         });
+
+        const roomResp = {
+          name: room.name,
+          roomId: groupRoom,
+          users: []
+        };
 
         room.users.forEach(function(user) {
           const userCheck = Meteor.users.findOne({username: user});
@@ -44,10 +59,14 @@ if (Meteor.isServer) {
             userId: userId,
             roomId: groupRoom
           });
+
+          roomResp.users.push(user);
         });
 
+        response.rooms.push(roomResp)
+
       });
-      return this.bodyParams;
+      return response;
     }
   });
 
@@ -80,7 +99,7 @@ if (Meteor.isServer) {
       });
 
       return Chatter.addUser({
-        username,
+        userId,
         userType
       });
     }
@@ -89,7 +108,7 @@ if (Meteor.isServer) {
   Api.addRoute('addUserToRoom', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
-        userId: String,
+        username: String,
         roomId: String
       });
 
