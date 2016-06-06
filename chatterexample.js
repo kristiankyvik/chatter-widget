@@ -1,78 +1,120 @@
-const inIframe = function () {
-  try {
-      return window.self !== window.top;
-  } catch (e) {
-      return true;
-  }
-}
-
-const chatterDispatcher = {
-  minimize: function() {
-    const data = {
-      origin: "chatter-child",
-      message: "minimizeChatter"
-    };
-    window.parent.postMessage(data, "*");
-  },
-
-  expand: function() {
-    const data = {
-      origin: "chatter-child",
-      message: "expandChatter"
-    };
-    window.parent.postMessage(data, "*");
-  },
-
-  show: function() {
-    console.log("show being called");
-    const data = {
-      origin: "chatter-child",
-      message: "showChatter"
-    };
-    window.parent.postMessage(data, "*");
-  },
-
-  hide: function() {
-    console.log("hide being called");
-    const data = {
-      origin: "chatter-child",
-      message: "hideChatter"
-    };
-    window.parent.postMessage(data, "*");
-  }
-};
-
 if (Meteor.isClient) {
+  // Helper method simply returning true when application is contained in an iframe
+  const inIframe = function () {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+  }
+
+  // Attached lazy listeners to chatter floating widget and to the minimizing button. This hack is needed in order to take control over the UI which is defined inn the chatter-semantic package.
+  const attachButtonListeners = function() {
+    $("body").on("click", "#chatter-close", function () {
+      const check = inIframe();
+      check ? chatterDispatcher.minimize() : Session.set("chatOpen", false);
+    });
+    $("body").on("click", "#chatter-open", function () {
+      const check = inIframe();
+      check ? chatterDispatcher.expand() : Session.set("chatOpen", true);
+    });
+  }
+
+  // This object is the interface between the chatter application and the widget embedded in the external site. It uses the postMessage protocol to communicate with the widget.
+  const chatterDispatcher = {
+    // Notifies that the chatter application contained by the iframe has loaded and that it is ready to receive messages
+    loaded: function() {
+      const data = {
+        origin: "chatter-app",
+        message: "chatter-loaded"
+      };
+      window.parent.postMessage(data, "*");
+    },
+
+    // Notifies that the widget (iframe containing the chatter app) should be minimized
+    minimize: function() {
+      const data = {
+        origin: "chatter-app",
+        message: "minimize-widget"
+      };
+      window.parent.postMessage(data, "*");
+    },
+
+    // Notifies that the widget (iframe containing the chatter app) should be expanded
+    expand: function() {
+      const data = {
+        origin: "chatter-app",
+        message: "expand-widget"
+      };
+      window.parent.postMessage(data, "*");
+    },
+
+    // Notifies that widget should be displayed
+    show: function() {
+      const data = {
+        origin: "chatter-app",
+        message: "show-widget"
+      };
+      window.parent.postMessage(data, "*");
+    },
+
+    // Notifies that the widget should be hidden
+    hide: function() {
+      const data = {
+        origin: "chatter-app",
+        message: "hide-widget"
+      };
+      window.parent.postMessage(data, "*");
+    }
+  };
+
+  // App has loaded and is ready to receive messages
+  chatterDispatcher.loaded();
+  // Attaches listeners to chatter buttons
+  attachButtonListeners();
+
+  // Checsk whether user has logged into the chatter app
   Tracker.autorun(function() {
-    console.log("check if user is logged in");
+    console.log("[CHATTER]: check if user is logged to Chatter");
     if (Meteor.userId()) {
-      console.log("User is logged in");
-      $("body").on("click", "#chatter-close", function () {
-        const check = inIframe();
-        check ? chatterDispatcher.minimize() : Session.set("chatOpen", false);
-      });
-      $("body").on("click", "#chatter-open", function () {
-        const check = inIframe();
-        check ? chatterDispatcher.expand() : Session.set("chatOpen", true);
-      });
+      console.log("[CHATTER]: user is logged in to Chatter");
+      // if user succesfully logged in, we want to display the widget and make sure it is minified by default
       chatterDispatcher.show();
+      Session.set("chatOpen", false);
     } else {
-      console.log("User is not logged in");
+      console.log("[CHATTER]: user is not logged in to Chatter");
     }
   });
 
-  window.onmessage = function(e){
-    console.log("child received from parent!:  ", e.data);
-    if (e.data.origin == "chatter-parent" && e.data.message == "loginChatter") {
-      console.log("check if user has logged in");
-      Meteor.loginWithPassword(e.data.username, e.data.password);
-    } else if (e.data.origin == "chatter-parent" && e.data.message == "logoutChatter") {
-      Meteor.logout();
-    } else if (e.data.origin == "chatter-parent" && e.data.message == "minimizedChatter") {
-      Session.set("chatOpen", false);
-    } else if (e.data.origin == "chatter-parent" && e.data.message == "expandedChatter") {
-      Session.set("chatOpen", true);
-    } else {
+  // Setting up message listener for multiple browsers
+  var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+  var eventer = window[eventMethod];
+  var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+  // Listens for messages received from parent and reacts accordingly
+  eventer(messageEvent,function(e) {
+    if (e.data.origin == "chatter-widget") {
+      console.log("[FROM: widget TO: chatter] => ", e.data);
+      switch(e.data.message) {
+        // Attempts to login to the chatter app given credentials
+        case "login-chatter":
+          Meteor.loginWithPassword(e.data.username, e.data.password);
+          break;
+        // Log out of the chatter app
+        case "logout-chatter":
+          Meteor.logout();
+          break;
+        // Widget confirms it is ready for chatter app to minimize
+        case "minimized-chatter":
+          Session.set("chatOpen", false);
+          break;
+        // Widget confirms it is ready for chatter app to expand
+        case "expanded-chatter":
+          Session.set("chatOpen", true);
+          break;
+      }
     }
-  };
+  },false);
 }
+
+
