@@ -1,3 +1,10 @@
+Meteor.startup(function() {
+  if (Meteor.isClient) {
+    // Log out user in order to authenticate again
+    Meteor.logout();
+  }
+});
+
 if (Meteor.isClient) {
   // Helper method simply returning true when application is contained in an iframe
   const inIframe = function () {
@@ -73,9 +80,9 @@ if (Meteor.isClient) {
   // Attaches listeners to chatter buttons
   attachButtonListeners();
 
-  // Checsk whether user has logged into the chatter app
+  // Check whether user has logged into the chatter app
   Tracker.autorun(function() {
-    console.log("[CHATTER]: check if user is logged to Chatter");
+    console.log("[CHATTER]: checking if user is logged to Chatter....");
     if (Meteor.userId()) {
       console.log("[CHATTER]: user is logged in to Chatter");
       // if user succesfully logged in, we want to display the widget and make sure it is minified by default
@@ -91,13 +98,14 @@ if (Meteor.isClient) {
   var eventer = window[eventMethod];
   var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 
-  // Listens for messages received from parent and reacts accordingly
+  // Listens for messages received from chatter widget and reacts accordingly
   eventer(messageEvent,function(e) {
     if (e.data.origin == "chatter-widget") {
       console.log("[FROM: widget TO: chatter] => ", e.data);
       switch(e.data.message) {
         // Attempts to login to the chatter app given credentials
         case "login-chatter":
+          console.log("[CHATTER]: attempting to log in to Chatter");
           Meteor.loginWithPassword(e.data.username, e.data.password);
           break;
         // Log out of the chatter app
