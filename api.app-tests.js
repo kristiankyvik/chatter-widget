@@ -75,7 +75,8 @@ if (Meteor.isServer) {
     });
 
 
-    describe("when user is logged in logged in", function() {
+    describe("when user is logged in", function() {
+      let chatterUserId;
 
       before(function(done) {
         Meteor.http.call("POST", Meteor.absoluteUrl("api/login"), body, callbackWrapper((error, response) => {
@@ -198,6 +199,7 @@ if (Meteor.isServer) {
         Meteor.http.call("POST", Meteor.absoluteUrl("api/addUser"), body, callbackWrapper((error, response) => {
           assert.equal(response.statusCode, 200);
           assert.isString(response.data);
+          chatterUserId = response.data;
           done();
         }));
       });
@@ -267,9 +269,64 @@ if (Meteor.isServer) {
           }));
         });
 
+          describe("and a user has been adeed to a room", function() {
+            beforeEach(function(done) {
+
+              roomId = new Chatter.Room({
+                name: "anothertestroom",
+                description: "testdescription"
+              }).save();
+
+              const userRooom  = new Chatter.UserRoom({
+                userId: chatterUserId,
+                roomId
+              }).save();
+
+              done();
+            });
+
+            it("/[removeUserFromRoom] succeeds when correct parameters are sent in", function(done) {
+
+              body.data = {
+                roomId,
+                username: "newuser"
+              };
+
+              Meteor.http.call("POST", Meteor.absoluteUrl("api/removeUserFromRoom"), body, callbackWrapper((error, response) => {
+                assert.equal(response.statusCode, 200);
+                assert.isNumber(response.data);
+                done();
+              }));
+            });
+
+            it("/[removeRoom] succeeds when correct parameters are sent in", function(done) {
+
+              body.data = {
+                roomId
+              };
+
+              Meteor.http.call("POST", Meteor.absoluteUrl("api/removeRoom"), body, callbackWrapper((error, response) => {
+                assert.equal(response.statusCode, 200);
+                assert.isNumber(response.data);
+                done();
+              }));
+            });
+
+
+            it("/[removeUser] succeeds when correct parameters are sent in", function(done) {
+
+              body.data = {
+                username: "newuser"
+              };
+
+              Meteor.http.call("POST", Meteor.absoluteUrl("api/removeUser"), body, callbackWrapper((error, response) => {
+                assert.equal(response.statusCode, 200);
+                assert.isNumber(response.data);
+                done();
+              }));
+            });
+          });
       });
-
-
     });
   });
 }

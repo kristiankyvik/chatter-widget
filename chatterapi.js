@@ -7,7 +7,6 @@ if (Meteor.isServer) {
   });
 
   Api.addRoute('setup', {authRequired: true}, {
-
     post: function () {
       check(this.bodyParams, {
         users: [Match.ObjectIncluding({username: String, password: String, userType: Match.Maybe(String)})],
@@ -84,6 +83,18 @@ if (Meteor.isServer) {
     }
   });
 
+  Api.addRoute('removeRoom', {authRequired: true}, {
+    post: function () {
+      check(this.bodyParams, {
+        roomId: String
+      });
+
+      return Chatter.removeRoom({
+        roomId: this.bodyParams.roomId
+      });
+    }
+  });
+
   Api.addRoute('addUser', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
@@ -105,6 +116,26 @@ if (Meteor.isServer) {
     }
   });
 
+  Api.addRoute('removeUser', {authRequired: true}, {
+    post: function () {
+      check(this.bodyParams, {
+        username: String
+      });
+
+      const user = Meteor.users.findOne({username: this.bodyParams.username});
+
+      if (!user) {
+        throw new Meteor.Error("unknown-user", "user cannot be recognized");
+      }
+
+      Meteor.users.remove(user._id);
+
+      return Chatter.removeUser({
+        userId: user._id
+      });
+    }
+  });
+
   Api.addRoute('addUserToRoom', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
@@ -118,6 +149,26 @@ if (Meteor.isServer) {
       }
       userId = user._id;
       return Chatter.addUserToRoom({
+        userId: userId,
+        roomId: this.bodyParams.roomId
+      });
+    }
+  });
+
+  Api.addRoute('removeUserFromRoom', {authRequired: true}, {
+    post: function () {
+      check(this.bodyParams, {
+        username: String,
+        roomId: String
+      });
+
+      const user = Meteor.users.findOne({username: this.bodyParams.username});
+      if (!user) {
+        throw new Meteor.Error("unknown-user", "user cannot be recognized");
+      }
+      const userId = user._id;
+
+      return Chatter.removeUserFromRoom({
         userId: userId,
         roomId: this.bodyParams.roomId
       });

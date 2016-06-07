@@ -27,6 +27,9 @@ if (Meteor.isClient) {
     });
   }
 
+  //Params to setup
+  HOST_URL = "http://localhost:4000/"
+
   // This object is the interface between the chatter application and the widget embedded in the external site. It uses the postMessage protocol to communicate with the widget.
   const chatterDispatcher = {
     // Notifies that the chatter application contained by the iframe has loaded and that it is ready to receive messages
@@ -110,6 +113,7 @@ if (Meteor.isClient) {
           break;
         // Log out of the chatter app
         case "logout-chatter":
+          console.log("[CHATTER]: attempting to log off");
           Meteor.logout();
           break;
         // Widget confirms it is ready for chatter app to minimize
