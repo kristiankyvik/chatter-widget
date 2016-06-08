@@ -9,4 +9,4 @@ Background:
 
 Scenario: User visits a room
   Then I should see the chat widget
-  And I should see no active or archived channels
+  When I click on the widget it should expand

@@ -25,8 +25,6 @@ ddp-rate-limiter@1.0.2
 ddp-server@1.2.4
 deps@1.0.10
 diff-sequence@1.0.3
-dispatch:mocha-browser@0.0.3
-dispatch:mocha-core@0.0.2
 ecmascript@0.4.1
 ecmascript-runtime@0.2.8
 ejson@1.0.9
@@ -60,6 +58,7 @@ minifier-css@1.1.9
 minifier-js@1.1.9
 minifiers@1.1.7
 minimongo@1.0.12
+mizzao:user-status@0.1.7
 mobile-experience@1.0.2
 mobile-status-bar@1.0.10
 modules@0.5.1
