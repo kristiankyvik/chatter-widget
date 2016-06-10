@@ -7,7 +7,6 @@ const callbackWrapper = function(fn) {
 };
 
 const emptyDatabase = function() {
-  Chatter.User.remove({});
   Chatter.UserRoom.remove({});
   Chatter.Room.remove({});
   Chatter.Message.remove({});
@@ -16,10 +15,11 @@ const emptyDatabase = function() {
 
 if (Meteor.isServer) {
   const body = {};
+  let userId;
 
   before(function() {
     emptyDatabase();
-    Accounts.createUser({
+    userId = Accounts.createUser({
       username: "testuser",
       password:"testpassword"
     });
@@ -27,7 +27,7 @@ if (Meteor.isServer) {
 
   describe("chatter widget api", function() {
 
-    describe("when user does not log in", function() {
+    describe("when user is not logged in", function() {
       it("does not allow unauthorized requests ", function(done) {
 
         body.data = {
@@ -42,7 +42,7 @@ if (Meteor.isServer) {
       });
     });
 
-    describe("when user creates a user account", function() {
+    describe("and when the user creates a user account", function() {
 
       it("return error when passing wrong parameters", function(done) {
 
@@ -57,7 +57,7 @@ if (Meteor.isServer) {
         }));
       });
 
-      it("return token anf user id when passing correct credentials", function(done) {
+      it("return token and user id when passing correct credentials", function(done) {
         const userId = Meteor.users.findOne({username: "testuser"})._id;
 
         body.data = {
@@ -75,9 +75,7 @@ if (Meteor.isServer) {
     });
 
 
-    describe("when user is logged in", function() {
-      let chatterUserId;
-
+    describe("and when user is logged in", function() {
       before(function(done) {
         Meteor.http.call("POST", Meteor.absoluteUrl("api/login"), body, callbackWrapper((error, response) => {
           assert.equal(response.data.status, "success");
@@ -114,39 +112,81 @@ if (Meteor.isServer) {
         }));
       });
 
-      it("/[setup] endpoint returns summary when right format is sent", function(done) {
+      describe("and when the /[setup] endpoint is hit with the right parameters", function() {
+        let u1, u2, r1, r2, r3;
 
-        body.data = {
-          "users": [
-            {
-              "username": "user1",
-              "password": "user1"
-            },
-            {
-              "username": "user2",
-              "password": "user2"
-            }
-          ],
-          "rooms": [
-            {
-              "name": "user1",
-              "users": ["user1"]
-            },
-            {
-              "name": "user2",
-              "users": ["user2"]
-            },
-            {
-              "name": "class chat",
-              "users": ["user1", "user2"]
-            }
-          ]
-        };
+        before(function(done) {
+          body.data = {
+            "users": [
+              {
+                "username": "user1",
+                "password": "user1"
+              },
+              {
+                "username": "user2",
+                "password": "user2",
+                "admin": true
+              }
+            ],
+            "rooms": [
+              {
+                "name": "user1",
+                "users": ["user1"]
+              },
+              {
+                "name": "user2",
+                "users": ["user2"]
+              },
+              {
+                "name": "class chat",
+                "users": ["user1", "user2"]
+              }
+            ]
+          };
+          Meteor.http.call("POST", Meteor.absoluteUrl("api/setup"), body, callbackWrapper((error, response) => {
+            assert.equal(response.statusCode, 200);
+            done();
+          }));
+        });
 
-        Meteor.http.call("POST", Meteor.absoluteUrl("api/setup"), body, callbackWrapper((error, response) => {
-          assert.equal(response.statusCode, 200);
-          done();
-        }));
+        it("users are added correctly", function() {
+          u1 = Meteor.users.findOne({username: "user1"});
+          u2 = Meteor.users.findOne({username: "user2"});
+
+          assert.isDefined(u1);
+          assert.equal(u1.profile.isChatterUser, true);
+          assert.equal(u1.profile.chatterNickname, "user1");
+          assert.equal(u1.profile.chatterAvatar, `http://api.adorable.io/avatars/${u1.username}`);
+          assert.equal(u1.profile.isChatterAdmin, false);
+
+          assert.isDefined(u2);
+          assert.equal(u2.profile.isChatterUser, true);
+          assert.equal(u2.profile.chatterNickname, "user2");
+          assert.equal(u2.profile.chatterAvatar, `http://api.adorable.io/avatars/${u2.username}`);
+          assert.equal(u2.profile.isChatterAdmin, true);
+        });
+
+        it("rooms are added correctly", function() {
+          r1 = Chatter.Room.findOne({name: "user1"});
+          r2 = Chatter.Room.findOne({name: "user2"});
+          r3 = Chatter.Room.findOne({name: "class chat"});
+
+          assert.isDefined(r1);
+          assert.isDefined(r2);
+          assert.isDefined(r3);
+        });
+
+        it("users are aded to rooms correctly", function() {
+          const ur1 = Chatter.UserRoom.findOne({userId: u1._id, roomId: r1._id});
+          const ur2 = Chatter.UserRoom.findOne({userId: u2._id, roomId: r2._id});
+          const ur3 = Chatter.UserRoom.findOne({userId: u1._id, roomId: r3._id});
+          const ur4 = Chatter.UserRoom.findOne({userId: u2._id, roomId: r3._id});
+
+          assert.isDefined(ur1);
+          assert.isDefined(ur2);
+          assert.isDefined(ur3);
+          assert.isDefined(ur4);
+        });
       });
 
       it("/[addRoom] endpoint returns error when wrong parameters are sent", function(done) {
@@ -163,19 +203,29 @@ if (Meteor.isServer) {
         }));
       });
 
-      it("/[addRoom] endpoint succeds when correct parameters are sent", function(done) {
+      describe("and when the /[addRoom] endpoint is hit with the right parameters", function() {
 
-        body.data = {
-          name: "testroom",
-          description: "testdescription"
-        };
+        before(function(done) {
+          body.data = {
+            name: "testroom",
+            description: "testdescription"
+          };
 
-        Meteor.http.call("POST", Meteor.absoluteUrl("api/addRoom"), body, callbackWrapper((error, response) => {
-          assert.equal(response.statusCode, 200);
-          assert.isString(response.data);
-          done();
-        }));
+          Meteor.http.call("POST", Meteor.absoluteUrl("api/addRoom"), body, callbackWrapper((error, response) => {
+            assert.equal(response.statusCode, 200);
+            assert.isString(response.data);
+            done();
+          }));
+        });
+
+        it("rooms are added correctly", function() {
+          const r1 = Chatter.Room.findOne({name: "testroom"});
+          assert.equal(r1.name, "testroom");
+          assert.equal(r1.description, "testdescription");
+        });
+
       });
+
 
       it("/[addUser] endpoint returns error when wrong parameters are sent", function(done) {
 
@@ -189,23 +239,51 @@ if (Meteor.isServer) {
         }));
       });
 
-      it("/[addUser] endpoint succeds when correct parameters are sent", function(done) {
+      describe("and when the /[addUser] endpoint is hit with the right parameters", function() {
 
-        body.data = {
-          "username": "newuser",
-          "password": "newpassword"
-        };
+        before(function(done) {
+          body.data = {
+            "username": "newuser1",
+            "password": "newpassword"
+          };
 
-        Meteor.http.call("POST", Meteor.absoluteUrl("api/addUser"), body, callbackWrapper((error, response) => {
-          assert.equal(response.statusCode, 200);
-          assert.isString(response.data);
-          chatterUserId = response.data;
-          done();
-        }));
+          Meteor.http.call("POST", Meteor.absoluteUrl("api/addUser"), body, callbackWrapper((error, response) => {
+            assert.equal(response.statusCode, 200);
+            assert.isString(response.data);
+          }));
+
+          body.data = {
+            "username": "newuser2",
+            "password": "newpassword2",
+            "admin": true
+          };
+
+          Meteor.http.call("POST", Meteor.absoluteUrl("api/addUser"), body, callbackWrapper((error, response) => {
+            assert.equal(response.statusCode, 200);
+            assert.isString(response.data);
+            done();
+          }));
+
+        });
+
+        it("user are added correctly", function() {
+          const u1 = Meteor.users.findOne({username: "newuser1"});
+          assert.equal(u1.profile.isChatterUser, true);
+          assert.equal(u1.profile.chatterNickname, "newuser1");
+          assert.equal(u1.profile.chatterAvatar, `http://api.adorable.io/avatars/${u1.username}`);
+          assert.equal(u1.profile.isChatterAdmin, false);
+
+          const u2 = Meteor.users.findOne({username: "newuser2"});
+          assert.equal(u2.profile.isChatterUser, true);
+          assert.equal(u2.profile.chatterNickname, "newuser2");
+          assert.equal(u2.profile.chatterAvatar, `http://api.adorable.io/avatars/${u2.username}`);
+          assert.equal(u2.profile.isChatterAdmin, true);
+        });
+
       });
 
       describe("and a room and user have been added", function() {
-        let roomId;
+        let roomId, userId;
 
         before(function(done) {
           roomId = Chatter.addRoom({
@@ -255,77 +333,72 @@ if (Meteor.isServer) {
           }));
         });
 
-        it("/[addUserToRoom] endpoint succeds when correct parameters are sent", function(done) {
+        describe("and when the /[addUserToRoom] endpoint is hit with the right parameters", function() {
 
-          body.data = {
-            username: "newuser",
-            roomId
-          };
+          before(function(done) {
+            body.data = {
+              username: "newuser1",
+              roomId
+            };
 
-          Meteor.http.call("POST", Meteor.absoluteUrl("api/addUserToRoom"), body, callbackWrapper((error, response) => {
-            assert.equal(response.statusCode, 200);
-            assert.isString(response.data);
-            done();
-          }));
+            Meteor.http.call("POST", Meteor.absoluteUrl("api/addUserToRoom"), body, callbackWrapper((error, response) => {
+              assert.equal(response.statusCode, 200);
+              assert.isString(response.data);
+              done();
+            }));
+          });
+
+          it("user is added to correct room", function() {
+            userId = Meteor.users.findOne({username: "newuser1"})._id;
+            const ur = Chatter.UserRoom.findOne({userId, roomId});
+            assert.isDefined(ur);
+          });
         });
 
-          describe("and a user has been adeed to a room", function() {
-            beforeEach(function(done) {
 
-              roomId = new Chatter.Room({
-                name: "anothertestroom",
-                description: "testdescription"
-              }).save();
+        describe("and when the /[removeUserFromRoom] endpoint is hit with the right parameters", function() {
 
-              const userRooom  = new Chatter.UserRoom({
-                userId: chatterUserId,
-                roomId
-              }).save();
+          before(function(done) {
 
+            body.data = {
+              roomId,
+              username: "newuser1"
+            };
+
+            Meteor.http.call("POST", Meteor.absoluteUrl("api/removeUserFromRoom"), body, callbackWrapper((error, response) => {
+              assert.equal(response.statusCode, 200);
+              assert.isNumber(response.data);
               done();
-            });
+            }));
+          });
 
-            it("/[removeUserFromRoom] succeeds when correct parameters are sent in", function(done) {
+          it("the user actually removes the user from the room", function() {
+            const ur = Chatter.UserRoom.findOne({userId, roomId});
+            assert.isUndefined(ur);
+          });
 
+
+          describe("and when the /[removeUser] endpoint is hit with the right parameters", function() {
+
+            before(function(done) {
               body.data = {
-                roomId,
-                username: "newuser"
+                username: "testuser"
               };
 
-              Meteor.http.call("POST", Meteor.absoluteUrl("api/removeUserFromRoom"), body, callbackWrapper((error, response) => {
-                assert.equal(response.statusCode, 200);
-                assert.isNumber(response.data);
-                done();
-              }));
-            });
-
-            it("/[removeRoom] succeeds when correct parameters are sent in", function(done) {
-
-              body.data = {
-                roomId
-              };
-
-              Meteor.http.call("POST", Meteor.absoluteUrl("api/removeRoom"), body, callbackWrapper((error, response) => {
-                assert.equal(response.statusCode, 200);
-                assert.isNumber(response.data);
-                done();
-              }));
-            });
-
-
-            it("/[removeUser] succeeds when correct parameters are sent in", function(done) {
-
-              body.data = {
-                username: "newuser"
-              };
 
               Meteor.http.call("POST", Meteor.absoluteUrl("api/removeUser"), body, callbackWrapper((error, response) => {
                 assert.equal(response.statusCode, 200);
-                assert.isNumber(response.data);
+                assert.isString(response.data);
                 done();
               }));
             });
+
+            it("user is removed as expected", function() {
+              const u = Meteor.users.findOne({username: "testuser"});
+              assert.isUndefined(u);
+            });
           });
+        });
       });
     });
   });

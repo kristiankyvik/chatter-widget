@@ -9,7 +9,7 @@ if (Meteor.isServer) {
   Api.addRoute('setup', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
-        users: [Match.ObjectIncluding({username: String, password: String, userType: Match.Maybe(String)})],
+        users: [Match.ObjectIncluding({username: String, password: String, admin: Match.Optional(Match.OneOf(Boolean, String, undefined))})],
         rooms: [Match.ObjectIncluding({name: String, users: [String]})]
       });
 
@@ -20,19 +20,24 @@ if (Meteor.isServer) {
       };
 
       users.forEach(function(user) {
+        const isAdmin = user.admin ? true : false;
+
         const userId = Accounts.createUser({
           username: user.username,
           password: user.password
         });
 
-        const chatterUserId = Chatter.addUser({
-          userId: userId,
-          userType: user.userType
+        Meteor.users.update(
+          {_id: userId},
+          { $set: {
+            "profile.isChatterAdmin": isAdmin
+          }
         });
 
         response.users.push({
           userId,
-          username: user.username
+          username: user.username,
+          admin: isAdmin
         });
       });
 
@@ -100,19 +105,24 @@ if (Meteor.isServer) {
       check(this.bodyParams, {
         username: String,
         password: String,
-        userType: Match.Maybe(String)
+        admin: Match.Optional(Match.OneOf(Boolean, String, undefined))
       });
 
-      const {username, password, userType} = this.bodyParams;
+      const {username, password, admin} = this.bodyParams;
+      const isAdmin = admin ? true : false;
+
       const userId = Accounts.createUser({
         username,
         password
       });
 
-      return Chatter.addUser({
-        userId,
-        userType
+      Meteor.users.update(
+        {_id: userId},
+        { $set: {
+          "profile.isChatterAdmin": isAdmin
+        }
       });
+      return userId
     }
   });
 
@@ -129,10 +139,7 @@ if (Meteor.isServer) {
       }
 
       Meteor.users.remove(user._id);
-
-      return Chatter.removeUser({
-        userId: user._id
-      });
+      return user._id;
     }
   });
 
