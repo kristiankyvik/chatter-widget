@@ -215,29 +215,6 @@ window.onbeforeunload = function(event) {
 }
 
 ```
-This will add the chat widget in the form of an iframe in your site's DOM. In order to interact with the widget, and for example login/logout users, the following hooks are to be used.
-
-#### Login a user
-
-```javascript
-  var data = {
-    "username": "username",
-    "password": "password",
-    "origin": "chatter-parent",
-    "command": "login"
-  };
-  document.getElementById("chatter-widget").contentWindow.postMessage(data, '*');
-```
-
-#### Login a user
-```javascript
-  var data = {
-    "origin": "chatter-parent",
-    "command": "logoff"
-  };
-  document.getElementById("chatter-widget").contentWindow.postMessage(data, '*');
-```
-
 The most elegant way to do so is to host the previous script as a static file and to inject the script asynchronously since you don’t want to slow down your client’s website in any way.
 
 ```html
