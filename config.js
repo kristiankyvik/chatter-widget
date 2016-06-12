@@ -17,5 +17,13 @@ if (Meteor.isServer) {
     user.profile.chatterAvatar = `http://api.adorable.io/avatars/${user.username}`;
     return user;
   });
+
+  // Default user created for you to use
+  if ( Meteor.users.find().count() === 0 ) {
+    Accounts.createUser({
+      username: 'chatter-admin',
+      password: 'chatter-admin'
+  });
+  }
 }
 

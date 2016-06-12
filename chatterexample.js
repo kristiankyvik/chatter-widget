@@ -1,6 +1,7 @@
 Meteor.startup(function() {
   if (Meteor.isClient) {
     // Log out user in order to authenticate again
+    // WARNIUNG: uncomment when deploying
     // Meteor.logout();
   }
 });

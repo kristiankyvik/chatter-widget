@@ -53,6 +53,7 @@ localstorage@1.0.7
 logging@1.0.10
 meteor@1.1.12
 meteor-base@1.0.2
+meteorhacks:subs-manager@1.6.4
 meteortoys:toykit@2.2.1
 minifier-css@1.1.9
 minifier-js@1.1.9
