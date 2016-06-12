@@ -140,124 +140,124 @@ Removes a user from a room.
 In order to add the chat instance to your website you a small snippet of javascript will need to be added to your source code. The snippet will take care of embedding a new iframe containing the chatter application on your site. Please note that the CHATTER_APP_URL needs to be changed to whatever location your chatter application is running in.
 
 ```javascript
-// Creating styles tag containing the CSS for the widget. The height of the widget is set to be the size of the window of the parent
-var s = document.createElement("style");
-s.innerHTML = "#chatter-widget{position:absolute}#chatter-widget.chatter-widget-hidden{display:none}#chatter-widget.chatter-widget-show{display:block}#chatter-widget.chatter-widget-open{width:350px;right:0px;bottom:0px}#chatter-widget.chatter-widget-collapsed{height:60px;width:100px;right:10px;bottom:20px}"
-// Parameters to setup
-CHATTER_APP_URL = "http://localhost:3000/";
-// Creating the iframe and adding appropiate attributes
-var chatterWidget = document.createElement("iframe");
-chatterWidget.id = "chatter-widget";
-// TODO: change to actual URL hosting chatter
-chatterWidget.src = CHATTER_APP_URL;
-chatterWidget.allowtransparency="true";
-chatterWidget.frameBorder = "0";
-chatterWidget.scrolling ="no";
-chatterWidget.className = "chatter-widget-hidden";
-// Append both the iframe tag and the styles tag to the body
-document.body.appendChild(chatterWidget);
-document.body.appendChild(s);
-// Global object containing the settings and the communication interface with the chatter app
-Chatter = {
-  heightExpanded: window.innerHeight,
-  expanded: false,
-  // Hides the chatter widget making it invisible
-  hide: function() {
-    chatterWidget.className = "chatter-widget-hidden";
-  },
-  // Sends logout message to chatter app and hides the widget
-  logout: function() {
-    var data = {origin: "chatter-widget", message: "logout-chatter"}
-    chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
-    chatterWidget.className = "chatter-widget-hidden";
-  },
-  // Send credentials to the chatter app
-  login: function() {
-    if (Meteor.user()) {
-      var username = Meteor.user().username;
+  // Creating styles tag containing the CSS for the widget. The height of the widget is set to be the size of the window of the parent
+  var s = document.createElement("style");
+  s.innerHTML = "#chatter-widget{position:absolute}#chatter-widget.chatter-widget-hidden{display:none}#chatter-widget.chatter-widget-show{display:block}#chatter-widget.chatter-widget-open{width:350px;right:0px;bottom:0px}#chatter-widget.chatter-widget-collapsed{height:60px;width:100px;right:10px;bottom:20px}"
+  // Parameters to setup
+  CHATTER_APP_URL = "http://localhost:3000/";
+  // Creating the iframe and adding appropiate attributes
+  var chatterWidget = document.createElement("iframe");
+  chatterWidget.id = "chatter-widget";
+  // TODO: change to actual URL hosting chatter
+  chatterWidget.src = CHATTER_APP_URL;
+  chatterWidget.allowtransparency="true";
+  chatterWidget.frameBorder = "0";
+  chatterWidget.scrolling ="no";
+  chatterWidget.className = "chatter-widget-hidden";
+  // Append both the iframe tag and the styles tag to the body
+  document.body.appendChild(chatterWidget);
+  document.body.appendChild(s);
+  // Global object containing the settings and the communication interface with the chatter app
+  Chatter = {
+    heightExpanded: window.innerHeight,
+    expanded: false,
+    // Hides the chatter widget making it invisible
+    hide: function() {
+      chatterWidget.className = "chatter-widget-hidden";
+    },
+    // Sends logout message to chatter app and hides the widget
+    logout: function() {
+      var data = {origin: "chatter-widget", message: "logout-chatter"}
+      chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
+      chatterWidget.className = "chatter-widget-hidden";
+    },
+    // Send credentials to the chatter app
+    login: function() {
+      if (Meteor.user()) {
+        var username = Meteor.user().username;
+        var data = {
+          username: username,
+          password: username,
+          origin: "chatter-widget",
+          message: "login-chatter"
+        }
+        chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
+      } else {
+        // TODO: find a smart way of checking again later if Meteor.user() is not loaded
+        console.log("[WIDGET]: Meteor.user() has not loaded yet. Try again later?")
+      }
+    },
+    // Makes the widget visible and iframe small and sends confimation message to chatter app
+    minimize: function() {
+      chatterWidget.className = "chatter-widget-show chatter-widget-collapsed";
+      this.expanded = false;
+      chatterWidget.removeAttribute("style");
       var data = {
-        username: username,
-        password: username,
         origin: "chatter-widget",
-        message: "login-chatter"
+        message: "minimized-chatter"
       }
       chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
-    } else {
-      // TODO: find a smart way of checking again later if Meteor.user() is not loaded
-      console.log("[WIDGET]: Meteor.user() has not loaded yet. Try again later?")
+    },
+    // Makes widget visible and iframes big and sends confimation message to chatter app
+    expand: function() {
+      chatterWidget.className = "chatter-widget-show chatter-widget-open";
+      chatterWidget.style.height = this.heightExpanded + "px";
+      this.expanded = true;
+      var data = {
+        origin: "chatter-widget",
+        message: "expanded-chatter"
+      }
+      chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
+    },
+    // Makes the widget visible and iframe small
+    show: function() {
+      chatterWidget.className = "chatter-widget-show chatter-widget-collapsed";
     }
-  },
-  // Makes the widget visible and iframe small and sends confimation message to chatter app
-  minimize: function() {
-    chatterWidget.className = "chatter-widget-show chatter-widget-collapsed";
-    this.expanded = false;
-    var data = {
-      origin: "chatter-widget",
-      message: "minimized-chatter"
+  };
+  // Setting up message listener for multiple browsers
+  var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+  var eventer = window[eventMethod];
+  var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+  // Listens for messages received from chatter app and reacts accordingly
+  eventer(messageEvent,function(e) {
+    if (e.data.origin == "chatter-app") {
+      console.log("[FROM: chatter TO: widget] => ", e.data);
+      switch(e.data.message) {
+        // If chatter app is loaded then send in the login credentials to the app
+        case "chatter-loaded":
+          Chatter.login();
+          break;
+        // Chatter widget can be displayed
+        case "show-widget":
+          Chatter.show();
+          break;
+        // Chatter widget can be minimized
+        case "minimize-widget":
+          Chatter.minimize();
+          break;
+        // Chatter widget can be hidden
+        case "hide-widget":
+          Chatter.hide();
+          break;
+        // Chatter widget can be expanded
+        case "expand-widget":
+          Chatter.expand();
+          break;
+      }
     }
-    chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
-  },
-  // Makes widget visible and iframes big and sends confimation message to chatter app
-  expand: function() {
-    chatterWidget.className = "chatter-widget-show chatter-widget-open";
-    chatterWidget.style.height = this.heightExpanded + "px";
-    this.expanded = true;
-    var data = {
-      origin: "chatter-widget",
-      message: "expanded-chatter"
+  },false);
+  // Detect when host page resizes its window and resize iframe accordingly
+  window.onresize = function(event) {
+    Chatter.heightExpanded = window.innerHeight;
+    if (Chatter.expanded) {
+      chatterWidget.style.height = window.innerHeight + "px";
     }
-    chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
-  },
-  // Makes the widget visible and iframe small
-  show: function() {
-    chatterWidget.className = "chatter-widget-show chatter-widget-collapsed";
+  };
+  // Detect when pages unloads in order to send logout message to the chatter app.
+  window.onbeforeunload = function(event) {
+    console.log("[WIDGET]: Host Page is unmounting, sending log out message to CHATTER")
+    Chatter.logout();
   }
-};
-// Setting up message listener for multiple browsers
-var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-var eventer = window[eventMethod];
-var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-// Listens for messages received from chatter app and reacts accordingly
-eventer(messageEvent,function(e) {
-  if (e.data.origin == "chatter-app") {
-    console.log("[FROM: chatter TO: widget] => ", e.data);
-    switch(e.data.message) {
-      // If chatter app is loaded then send in the login credentials to the app
-      case "chatter-loaded":
-        Chatter.login();
-        break;
-      // Chatter widget can be displayed
-      case "show-widget":
-        Chatter.show();
-        break;
-      // Chatter widget can be minimized
-      case "minimize-widget":
-        Chatter.minimize();
-        break;
-      // Chatter widget can be hidden
-      case "hide-widget":
-        Chatter.hide();
-        break;
-      // Chatter widget can be expanded
-      case "expand-widget":
-        Chatter.expand();
-        break;
-    }
-  }
-},false);
-// Detect when host page resizes its window and resize iframe accordingly
-window.onresize = function(event) {
-  Chatter.heightExpanded = window.innerHeight;
-  if (Chatter.expanded) {
-    chatterWidget.style.height = window.innerHeight + "px";
-  }
-};
-// Detect when pages unloads in order to send logout message to the chatter app.
-window.onbeforeunload = function(event) {
-  console.log("[WIDGET]: Host Page is unmounting, sending log out message to CHATTER")
-  Chatter.logout();
-}
-
 ```
 The most elegant way to do so is to host the previous script as a static file and to inject the script asynchronously since you don’t want to slow down your client’s website in any way.
 
