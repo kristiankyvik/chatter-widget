@@ -26,11 +26,25 @@ This is the main entry call to the api that allows you to configure the chat set
 }
 ```
 
+The response will look like the following:
+
+```
+{ status: "success", data: {authToken: "kjf98saufs9fjdsa89f7", userId: "kjsa9df0ds9f780s9f788"} }
+```
+
+You will need to save the userId and token on the client, for subsequent authenticated requests. The headers should be set in the following way.
+
+```
+X-User-Id: "kjf98saufs9fjdsa89f7"
+X-Auth-Token: "kjsa9df0ds9f780s9f788"
+```
+
+
 ##### [POST] /setup
 This is the main entry call to the api that allows you to configure the chat settings before embedding in on your website. A JSON must be sent in as the body of the request with the following format. This will specify users and the rooms desired. The usernames need to be unique and passwords are to be also predetermined. Users are by default not admins. Include the attribute `"admin":true` to create a user with admin rights.
 
 ```json
-data = {
+{
   "users": [
     {
       "username": "username1",
@@ -62,13 +76,23 @@ data = {
   ]
 }
 ```
+
 ##### [POST] /addUser
 Adds a user to chatter. Returns the id of the user.
 
 ```json
-data = {
+{
   "username": "username",
   "password": "password"
+}
+```
+
+##### [POST] /removeUser
+Removes a user to chatter. Returns the id of the user.
+
+```json
+{
+  "username": "username"
 }
 ```
 
@@ -76,21 +100,41 @@ data = {
 Adds a room to chatter. Returns id of the room.
 
 ```json
-data = {
+{
   "name": "username",
   "description": "password"
 }
 ```
 
-##### [POST] /addUserToRoom
-Adds a room to chatter. Returns id of the room.
+##### [POST] /removeRoom
+Removes a room from chatter. Returns id of the room.
 
 ```json
-data = {
+{
+  "roomId": "jkf9ds8f0dsaf089dsf"
+}
+```
+
+##### [POST] /addUserToRoom
+Adds a room to chatter.
+
+```json
+{
   "userId": "324kj23l40o",
   "roomId": "d9saf8df9sa"
 }
 ```
+
+##### [POST] /removeUserFromRoom
+Removes a user from a room.
+
+```json
+{
+  "userId": "324kj23l40o",
+  "roomId": "d9saf8df9sa"
+}
+```
+
 ### Ebbedable snippet
 
 In order to add the chat instance to your website you a small snippet of javascript will need to be added to your source code. The snippet will take care of embedding a new iframe containing the chatter application on your site. Please note that the CHATTER_APP_URL needs to be changed to whatever location your chatter application is running in.
