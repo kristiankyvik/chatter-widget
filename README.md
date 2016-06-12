@@ -1,4 +1,7 @@
+# WARNING: Pre-Alpha state, bugs and missing functionality everywhere!
+
 # Chatter Widget
+A chat widget that can be easily embedded in your site. Built using the chatter-core and chatter-semantic meteor packages.
 
 ## Configuration and setup
 
