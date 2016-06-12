@@ -176,6 +176,7 @@ In order to add the chat instance to your website you a small snippet of javascr
     },
     // Send credentials to the chatter app
     login: function() {
+      //REPLACE the credentials (username and password) with the ones of the user you want to log into chatter. This example here is what could be used in a Meteor application.
       if (Meteor.user()) {
         var username = Meteor.user().username;
         var data = {
@@ -186,8 +187,8 @@ In order to add the chat instance to your website you a small snippet of javascr
         }
         chatterWidget.contentWindow.postMessage(data, CHATTER_APP_URL);
       } else {
-        // TODO: find a smart way of checking again later if Meteor.user() is not loaded
-        console.log("[WIDGET]: Meteor.user() has not loaded yet. Try again later?")
+        // TODO: find a smart way of checking again later if user has not loaded
+        console.log("[WIDGET]: User has not loaded yet. Try again later?")
       }
     },
     // Makes the widget visible and iframe small and sends confimation message to chatter app
