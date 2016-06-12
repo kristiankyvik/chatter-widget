@@ -218,7 +218,6 @@ window.onbeforeunload = function(event) {
 The most elegant way to do so is to host the previous script as a static file and to inject the script asynchronously since you don’t want to slow down your client’s website in any way.
 
 ```html
-{
 <script>
   (function() {
     var d = document,
@@ -230,5 +229,4 @@ The most elegant way to do so is to host the previous script as a static file an
     h.appendChild(s);
   } )();
 </script>
-}
 ```
