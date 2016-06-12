@@ -33,3 +33,7 @@ xolvio:cleaner
 practicalmeteor:chai
 tmeasday:acceptance-test-driver
 nimble:restivus
+check
+http
+xolvio:backdoor
+mizzao:user-status

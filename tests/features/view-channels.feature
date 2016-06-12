@@ -1,3 +1,4 @@
+@watch
 Feature: View channels
 As a chatter user,
 so that I can get interact with the chat,
@@ -8,4 +9,4 @@ Background:
 
 Scenario: User visits a room
   Then I should see the chat widget
-  And I should see no active or archived channels
+  When I click on the widget it should expand

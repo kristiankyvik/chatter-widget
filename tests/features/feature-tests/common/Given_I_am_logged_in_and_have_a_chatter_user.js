@@ -1,11 +1,45 @@
+const fixtures = {
+  clientLogin: function (user) {
+    client.url('http://localhost:3000');
+    client.execute(function (user, done) {
+      Meteor.loginWithPassword(user.username, user.password, done);
+    }, user);
+  }
+}
+
 module.exports = function() {
+  this.Before( function() {
+    server.execute(function () {
+      Package['xolvio:cleaner'].resetDatabase();
+      Accounts.createUser({
+        username : "testuser",
+        password : "testuser"
+      });
+
+    });
+  });
+
+
   this.Given(/^I am logged in and have a chatter user$/, function () {
-    server.call("createTestUser");
-    browser.url('http://localhost:3000');
-    browser.waitForExist("#login-sign-in-link", 2000);
-    browser.click("#login-sign-in-link");
-    browser.setValue("input[id='login-email'", "kyvik_bcn@yahoo.es");
-    browser.setValue("input[id='login-password'", "banana");
-    browser.click("#login-buttons-password");
+
+    server.execute( function() {
+      const userId = Meteor.users.findOne()._id;
+
+      const chatterUserId = Chatter.addUser({
+        userId
+      });
+
+      const roomId = Chatter.addRoom({
+        name: "Test Room",
+        description: "this is a test room"
+      });
+
+      Chatter.addUserToRoom({
+        userId,
+        roomId
+      });
+    });
+
+    fixtures.clientLogin({username: "testuser", password: "testuser"});
   });
 };

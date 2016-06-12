@@ -10,12 +10,20 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-  Meteor.startup(function () {
-    Accounts.onCreateUser(function(options, user) {
-        user.firstName = options.firstName;
-        user.lastName = options.lastName;
-        user.avatar = "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg";
-        return user;
-    });
+  Accounts.onCreateUser(function(options, user) {
+    user.profile = options.profile ? options.profile : {};
+    user.profile.isChatterUser = true;
+    user.profile.chatterNickname = user.username;
+    user.profile.chatterAvatar = `http://api.adorable.io/avatars/${user.username}`;
+    return user;
   });
+
+  // Default user created for you to use
+  if ( Meteor.users.find().count() === 0 ) {
+    Accounts.createUser({
+      username: 'chatter-admin',
+      password: 'chatter-admin'
+  });
+  }
 }
+
