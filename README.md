@@ -2,6 +2,11 @@
 
 # Chatter Widget
 A chat widget that can be easily embedded in your site. Built using the chatter-core and chatter-semantic meteor packages.
+[Here is link to a demo showing a demo of chatter](http://chatter-widget.meteorapp.com). Just login with the following credentials to start chatting:
+```
+username: user1
+password: user1
+```
 
 ## Configuration and setup
 
