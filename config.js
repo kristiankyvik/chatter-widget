@@ -13,7 +13,6 @@ if (Meteor.isServer) {
   Accounts.onCreateUser(function(options, user) {
     user.profile = options.profile ? options.profile : {};
     user.profile.isChatterUser = true;
-    user.profile.isChatterAdmin = true;
     user.profile.chatterNickname = user.username;
     user.profile.chatterAvatar = `http://api.adorable.io/avatars/${user.username}`;
     return user;
@@ -24,14 +23,6 @@ if (Meteor.isServer) {
     Accounts.createUser({
       username: 'chatter-admin',
       password: 'chatter-admin'
-  });
-      Accounts.createUser({
-        username: 'user1',
-        password: 'user1'
-    });
-      Accounts.createUser({
-        username: 'user2',
-        password: 'user2'
     });
   }
 }
