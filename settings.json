@@ -2,7 +2,7 @@
   "galaxy.meteor.com": {
      "env": {
        "ROOT_URL": "http://chatter-widget.meteorapp.com",
-       "MONGO_URL": "mongodb://chatteradmin:Banana12!@ds013991.mlab.com:13991/chatter_mongodb"
+       "MONGO_URL": "mongodb://chatterWidgetAdmin:chatterWidgetAdmin@ds019796.mlab.com:19796/chatter_widget"
      }
    }
 }
