@@ -1,13 +1,18 @@
 if (Meteor.isServer) {
   // Global API configuration
+
   var Api = new Restivus({
     useDefaultAuth: true,
     prettyJson: true,
-    enableCors: true
+    enableCors: true,
+    onLoggedIn: function () {
+       console.log(this.user.username + ' (' + this.userId + ') logged in');
+     },
   });
 
   Api.addRoute('setup', {authRequired: true}, {
     post: function () {
+      console.log(this.bodyParams);
       check(this.bodyParams, {
         users: [Match.ObjectIncluding({username: String, password: String, admin: Match.Optional(Match.OneOf(Boolean, String, undefined))})],
         rooms: [Match.ObjectIncluding({name: String, users: [String]})]

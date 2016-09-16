@@ -150,7 +150,7 @@ In order to add the chat instance to your website you a small snippet of javascr
 ```javascript
   // Creating styles tag containing the CSS for the widget. The height of the widget is set to be the size of the window of the parent
   var s = document.createElement("style");
-  s.innerHTML = "#chatter-widget{position:absolute}#chatter-widget.chatter-widget-hidden{display:none}#chatter-widget.chatter-widget-show{display:block}#chatter-widget.chatter-widget-open{width:350px;right:0px;bottom:0px}#chatter-widget.chatter-widget-collapsed{height:60px;width:100px;right:10px;bottom:20px}"
+  s.innerHTML = "#chatter-widget{position:absolute}#chatter-widget.chatter-widget-hidden{display:none}#chatter-widget.chatter-widget-show{display:block}#chatter-widget.chatter-widget-open{width:360px;right:0px;bottom:0px}#chatter-widget.chatter-widget-collapsed{height:67px;width:100px;right:10px;bottom:20px}"
   // Parameters to setup
   CHATTER_APP_URL = "http://localhost:3000/";
   // Creating the iframe and adding appropiate attributes
