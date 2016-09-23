@@ -4,15 +4,11 @@ if (Meteor.isServer) {
   var Api = new Restivus({
     useDefaultAuth: true,
     prettyJson: true,
-    enableCors: true,
-    onLoggedIn: function () {
-       console.log(this.user.username + ' (' + this.userId + ') logged in');
-     },
+    enableCors: true
   });
 
   Api.addRoute('setup', {authRequired: true}, {
     post: function () {
-      console.log(this.bodyParams);
       check(this.bodyParams, {
         users: [Match.ObjectIncluding({username: String, password: String, admin: Match.Optional(Match.OneOf(Boolean, String, undefined))})],
         rooms: [Match.ObjectIncluding({name: String, users: [String]})]
@@ -49,7 +45,7 @@ if (Meteor.isServer) {
       rooms.forEach(function(room) {
         const groupRoom = Chatter.addRoom({
           name: room.name,
-          description: "group room"
+          description: room.description
         });
 
         const roomResp = {
