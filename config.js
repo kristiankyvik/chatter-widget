@@ -16,7 +16,6 @@ if (Meteor.isServer) {
     user.profile = options.profile ? options.profile : {};
     user.profile.isChatterUser = true;
     user.profile.chatterNickname = user.username;
-    user.profile.chatterAvatar = `http://api.adorable.io/avatars/${user.username}`;
     return user;
   });
 
