@@ -22,18 +22,24 @@ if (Meteor.isServer) {
 
       users.forEach(function(user) {
         const isAdmin = user.admin ? true : false;
+        const exists = Meteor.users.findOne({username: user.username});
+        let userId = null;
 
-        const userId = Accounts.createUser({
-          username: user.username,
-          password: user.password
-        });
+        if (!exists) {
+          userId = Accounts.createUser({
+            username: user.username,
+            password: user.password
+          });
 
-        Meteor.users.update(
-          {_id: userId},
-          { $set: {
-            "profile.isChatterAdmin": isAdmin
-          }
-        });
+          Meteor.users.update(
+            {_id: userId},
+            { $set: {
+              "profile.isChatterAdmin": isAdmin
+            }
+          });
+        } else {
+          userId = exists._id
+        }
 
         response.users.push({
           userId,
