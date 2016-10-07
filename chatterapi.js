@@ -51,13 +51,15 @@ if (Meteor.isServer) {
       rooms.forEach(function(room) {
         const groupRoom = Chatter.addRoom({
           name: room.name,
-          description: room.description
+          description: room.description,
+          ref: room.ref
         });
 
         const roomResp = {
           name: room.name,
           roomId: groupRoom,
-          users: []
+          users: [],
+          ref: room.ref
         };
 
         room.users.forEach(function(user) {
@@ -85,12 +87,16 @@ if (Meteor.isServer) {
     post: function () {
       check(this.bodyParams, {
         name: String,
-        description: String
+        description: String,
+        roomType: Match.Optional(Match.OneOf(String, undefined)),
+        ref: Match.Optional(Match.OneOf(String, undefined))
       });
 
       return Chatter.addRoom({
         name: this.bodyParams.name,
-        description: this.bodyParams.description
+        description: this.bodyParams.description,
+        roomType: this.bodyParams.roomType,
+        ref: this.bodyParams.ref
       });
     }
   });
@@ -145,8 +151,23 @@ if (Meteor.isServer) {
         throw new Meteor.Error("unknown-user", "user cannot be recognized");
       }
 
-      Meteor.users.remove(user._id);
-      return user._id;
+      userId = user._id;
+
+      return Chatter.removeUser({
+        userId
+      });
+    }
+  });
+
+  Api.addRoute('getRoom', {authRequired: true}, {
+    post: function () {
+      check(this.bodyParams, {
+        ref: String
+      });
+
+      const {ref} = this.bodyParams;
+
+      return Chatter.Room.findOne({ref})._id;
     }
   });
 
@@ -154,17 +175,20 @@ if (Meteor.isServer) {
     post: function () {
       check(this.bodyParams, {
         username: String,
-        roomId: String
+        roomId: Match.Optional(Match.OneOf(String, undefined)),
+        ref: Match.Optional(Match.OneOf(String, undefined))
       });
 
-      const user = Meteor.users.findOne({username: this.bodyParams.username});
+      const {username, roomId, ref} = this.bodyParams;
+
+      const user = Meteor.users.findOne({username: username});
       if (!user) {
         throw new Meteor.Error("unknown-user", "user cannot be recognized");
       }
       userId = user._id;
       return Chatter.addUserToRoom({
-        userId: userId,
-        roomId: this.bodyParams.roomId
+        userId,
+        roomId
       });
     }
   });
