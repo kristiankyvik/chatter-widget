@@ -2,7 +2,8 @@ Chatter.configure({
   nickProperty: "username",
   avatarProperty: "avatar",
   helpButton: true,
-  helpUser: "admin"
+  helpUser: "admin",
+  editableNickname: false
 });
 
 if (Meteor.isClient) {

@@ -159,6 +159,30 @@ if (Meteor.isServer) {
     }
   });
 
+  Api.addRoute('setNickname', {authRequired: true}, {
+    post: function () {
+      check(this.bodyParams, {
+        username: String,
+        nickname: String
+      });
+
+      const {username, nickname} = this.bodyParams;
+
+      const user = Meteor.users.findOne({username: username});
+
+      if (!user) {
+        throw new Meteor.Error("unknown-user", "user cannot be recognized");
+      }
+
+      userId = user._id;
+
+      return Chatter.setNickname({
+        userId,
+        nickname
+      });
+    }
+  });
+
   Api.addRoute('getRoom', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
