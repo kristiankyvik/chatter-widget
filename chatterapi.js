@@ -26,7 +26,19 @@ if (Meteor.isServer) {
         let userId = null;
 
         if (!exists) {
-          userId = Chatter.addUser(user);
+          userId = Accounts.createUser({
+            username: user.username,
+            password: user.password
+          });
+
+          Meteor.users.update(
+            {_id: userId},
+            { $set: {
+              "profile.isChatterAdmin": isAdmin,
+              "profile.supportUser": user.supportUser
+            }
+          });
+
         } else {
           userId = exists._id
         }

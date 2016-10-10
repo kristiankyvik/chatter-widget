@@ -2,7 +2,6 @@ Chatter.configure({
   nickProperty: "username",
   avatarProperty: "avatar",
   helpButton: true,
-  helpChannel: "admin",
   editableNickname: false
 });
 
