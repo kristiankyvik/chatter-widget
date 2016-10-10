@@ -2,7 +2,7 @@ Chatter.configure({
   nickProperty: "username",
   avatarProperty: "avatar",
   helpButton: true,
-  helpUser: "admin",
+  helpChannel: "admin",
   editableNickname: false
 });
 
@@ -11,21 +11,3 @@ if (Meteor.isClient) {
     passwordSignupFields: 'USERNAME_ONLY',
   });
 }
-
-if (Meteor.isServer) {
-  Accounts.onCreateUser(function(options, user) {
-    user.profile = options.profile ? options.profile : {};
-    user.profile.isChatterUser = true;
-    user.profile.chatterNickname = user.username;
-    return user;
-  });
-
-  // Default user created for you to use
-  if ( Meteor.users.find().count() === 0 ) {
-    Accounts.createUser({
-      username: 'chatter-admin',
-      password: 'chatter-admin'
-    });
-  }
-}
-

@@ -10,7 +10,7 @@ if (Meteor.isServer) {
   Api.addRoute('setup', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
-        users: [Match.ObjectIncluding({username: String, password: String, admin: Match.Optional(Match.OneOf(Boolean, String, undefined))})],
+        users: [Match.ObjectIncluding({username: String, password: String, admin: Match.Optional(Match.OneOf(Boolean, String, undefined)), supportUser: Match.Optional(Match.OneOf(String, undefined))})],
         rooms: [Match.ObjectIncluding({name: String, users: [String]})]
       });
 
@@ -26,17 +26,7 @@ if (Meteor.isServer) {
         let userId = null;
 
         if (!exists) {
-          userId = Accounts.createUser({
-            username: user.username,
-            password: user.password
-          });
-
-          Meteor.users.update(
-            {_id: userId},
-            { $set: {
-              "profile.isChatterAdmin": isAdmin
-            }
-          });
+          userId = Chatter.addUser(user);
         } else {
           userId = exists._id
         }
@@ -44,7 +34,8 @@ if (Meteor.isServer) {
         response.users.push({
           userId,
           username: user.username,
-          admin: isAdmin
+          admin: isAdmin,
+          supportUser: user.supportUser
         });
       });
 
@@ -118,10 +109,11 @@ if (Meteor.isServer) {
       check(this.bodyParams, {
         username: String,
         password: String,
-        admin: Match.Optional(Match.OneOf(Boolean, String, undefined))
+        admin: Match.Optional(Match.OneOf(Boolean, String, undefined)),
+        supportUser: Match.Optional(Match.OneOf(String, undefined))
       });
 
-      const {username, password, admin} = this.bodyParams;
+      const {username, password, admin, supportUser} = this.bodyParams;
       const isAdmin = admin ? true : false;
 
       const userId = Accounts.createUser({
@@ -132,7 +124,8 @@ if (Meteor.isServer) {
       Meteor.users.update(
         {_id: userId},
         { $set: {
-          "profile.isChatterAdmin": isAdmin
+          "profile.isChatterAdmin": isAdmin,
+          "profile.supportUser": supportUser
         }
       });
       return userId
