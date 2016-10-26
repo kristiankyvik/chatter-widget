@@ -31,12 +31,10 @@ if (Meteor.isServer) {
             password: user.password
           });
 
-          Meteor.users.update(
-            {_id: userId},
-            { $set: {
-              "profile.isChatterAdmin": isAdmin,
-              "profile.supportUser": user.supportUser
-            }
+          Chatter.addUser({
+            userId,
+            admin: isAdmin,
+            supportUser: user.supportUser
           });
 
         } else {
@@ -122,10 +120,11 @@ if (Meteor.isServer) {
         username: String,
         password: String,
         admin: Match.Optional(Match.OneOf(Boolean, String, undefined)),
-        supportUser: Match.Optional(Match.OneOf(String, undefined))
+        supportUser: Match.Optional(Match.OneOf(String, undefined)),
+        inClass: Match.Optional(Match.OneOf(String, undefined))
       });
 
-      const {username, password, admin, supportUser} = this.bodyParams;
+      const {username, password, admin, supportUser, inClass} = this.bodyParams;
       const isAdmin = admin ? true : false;
 
       const userId = Accounts.createUser({
@@ -137,7 +136,8 @@ if (Meteor.isServer) {
         {_id: userId},
         { $set: {
           "profile.isChatterAdmin": isAdmin,
-          "profile.supportUser": supportUser
+          "profile.supportUser": supportUser,
+          "profile.inClass": inClass,
         }
       });
       return userId

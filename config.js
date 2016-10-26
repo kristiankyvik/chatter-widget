@@ -2,7 +2,8 @@ Chatter.configure({
   nickProperty: "username",
   avatarProperty: "avatar",
   helpButton: true,
-  editableNickname: false
+  editableNickname: false,
+  chatName: "Hubro Chat"
 });
 
 if (Meteor.isClient) {
