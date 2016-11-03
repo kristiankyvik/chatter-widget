@@ -76,6 +76,8 @@ if (Meteor.isClient) {
     }
   };
 
+  // If iframe widget is open, we want to close it onload
+  chatterDispatcher.minimize();
   // App has loaded and is ready to receive messages
   chatterDispatcher.loaded();
   // Attaches listeners to chatter buttons
