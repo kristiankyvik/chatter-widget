@@ -1,7 +1,6 @@
 Chatter.configure({
   nickProperty: "username",
   avatarProperty: "avatar",
-  helpButton: true,
   editableNickname: false,
   chatName: "Hubro Chat"
 });
