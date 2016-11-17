@@ -1,17 +1,6 @@
+import { emptyDatabase, callbackWrapper } from "./test-helpers.js";
+
 console.log("running intergration api tests");
-
-const callbackWrapper = function (fn) {
-  return function (error, response) {
-    setTimeout(() => fn(error, response));
-  };
-};
-
-const emptyDatabase = function () {
-  Chatter.UserRoom.remove({});
-  Chatter.Room.remove({});
-  Chatter.Message.remove({});
-  Meteor.users.remove({});
-};
 
 if (Meteor.isServer) {
   const body = {};
