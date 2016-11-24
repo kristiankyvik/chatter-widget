@@ -10,7 +10,7 @@ if (Meteor.isServer) {
   Api.addRoute('setup', {authRequired: true}, {
     post: function () {
       check(this.bodyParams, {
-        users: [Match.ObjectIncluding({username: String, password: String, admin: Match.Optional(Match.OneOf(Boolean, String, undefined)), supportUser: Match.Optional(Match.OneOf(String, undefined))})],
+        users: [Match.ObjectIncluding({username: String, password: String, admin: Match.Maybe(Boolean), supportUser: Match.Maybe(Match.OneOf(String, null, undefined))})],
         rooms: [Match.ObjectIncluding({name: String, users: [String]})]
       });
 
@@ -21,7 +21,6 @@ if (Meteor.isServer) {
       };
 
       users.forEach(function(user) {
-        const isAdmin = user.admin ? true : false;
         const exists = Meteor.users.findOne({username: user.username});
         let userId = null;
 
@@ -33,7 +32,7 @@ if (Meteor.isServer) {
 
           Chatter.addUser({
             userId,
-            admin: isAdmin,
+            admin: user.admin,
             supportUser: user.supportUser
           });
 
@@ -44,7 +43,7 @@ if (Meteor.isServer) {
         response.users.push({
           userId,
           username: user.username,
-          admin: isAdmin,
+          admin: user.admin,
           supportUser: user.supportUser
         });
       });
@@ -89,8 +88,8 @@ if (Meteor.isServer) {
       check(this.bodyParams, {
         name: String,
         description: String,
-        roomType: Match.Optional(Match.OneOf(String, undefined)),
-        ref: Match.Optional(Match.OneOf(String, undefined))
+        roomType: Match.Maybe(String, undefined),
+        ref: Match.Maybe(String, undefined)
       });
 
       return Chatter.addRoom({
@@ -119,13 +118,12 @@ if (Meteor.isServer) {
       check(this.bodyParams, {
         username: String,
         password: String,
-        admin: Match.Optional(Match.OneOf(Boolean, String, undefined)),
-        supportUser: Match.Optional(Match.OneOf(String, undefined)),
-        inClass: Match.Optional(Match.OneOf(String, undefined))
+        admin: Match.Optional(Match.OneOf(Boolean, undefined)),
+        supportUser: Match.Maybe(String, undefined),
+        inClass: Match.Maybe(String, undefined)
       });
 
       const {username, password, admin, supportUser, inClass} = this.bodyParams;
-      const isAdmin = admin ? true : false;
 
       const userId = Accounts.createUser({
         username,
@@ -135,7 +133,7 @@ if (Meteor.isServer) {
       Meteor.users.update(
         {_id: userId},
         { $set: {
-          "profile.isChatterAdmin": isAdmin,
+          "profile.isChatterAdmin": admin,
           "profile.supportUser": supportUser,
           "profile.inClass": inClass,
         }
@@ -204,8 +202,8 @@ if (Meteor.isServer) {
     post: function () {
       check(this.bodyParams, {
         username: String,
-        roomId: Match.Optional(Match.OneOf(String, undefined)),
-        ref: Match.Optional(Match.OneOf(String, undefined))
+        roomId: Match.Maybe(String, undefined),
+        ref: Match.Maybe(String, undefined)
       });
 
       const {username, roomId, ref} = this.bodyParams;

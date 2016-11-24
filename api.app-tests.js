@@ -114,15 +114,18 @@ if (Meteor.isServer) {
             "rooms": [
               {
                 "name": "user1",
-                "users": ["user1"]
+                "users": ["user1"],
+                "description": "test description"
               },
               {
                 "name": "user2",
-                "users": ["user2"]
+                "users": ["user2"],
+                "description": "test description"
               },
               {
                 "name": "class chat",
-                "users": ["user1", "user2"]
+                "users": ["user1", "user2"],
+                "description": "test description"
               }
             ]
           };
@@ -139,13 +142,11 @@ if (Meteor.isServer) {
           assert.isDefined(u1);
           assert.equal(u1.profile.isChatterUser, true);
           assert.equal(u1.profile.chatterNickname, "user1");
-          assert.equal(u1.profile.chatterAvatar, `http://api.adorable.io/avatars/${u1.username}`);
           assert.equal(u1.profile.isChatterAdmin, false);
 
           assert.isDefined(u2);
           assert.equal(u2.profile.isChatterUser, true);
           assert.equal(u2.profile.chatterNickname, "user2");
-          assert.equal(u2.profile.chatterAvatar, `http://api.adorable.io/avatars/${u2.username}`);
           assert.equal(u2.profile.isChatterAdmin, true);
         });
 
@@ -246,13 +247,11 @@ if (Meteor.isServer) {
           const u1 = Meteor.users.findOne({username: "newuser1"});
           assert.equal(u1.profile.isChatterUser, true);
           assert.equal(u1.profile.chatterNickname, "newuser1");
-          assert.equal(u1.profile.chatterAvatar, `http://api.adorable.io/avatars/${u1.username}`);
           assert.equal(u1.profile.isChatterAdmin, false);
 
           const u2 = Meteor.users.findOne({username: "newuser2"});
           assert.equal(u2.profile.isChatterUser, true);
           assert.equal(u2.profile.chatterNickname, "newuser2");
-          assert.equal(u2.profile.chatterAvatar, `http://api.adorable.io/avatars/${u2.username}`);
           assert.equal(u2.profile.isChatterAdmin, true);
         });
       });
