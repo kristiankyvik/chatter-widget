@@ -20,7 +20,7 @@ if (Meteor.isServer) {
         rooms: []
       };
 
-      users.forEach(function(user) {
+      users.forEach(function (user) {
         const exists = Meteor.users.findOne({username: user.username});
         let userId = null;
 
@@ -35,9 +35,8 @@ if (Meteor.isServer) {
             admin: user.admin,
             supportUser: user.supportUser
           });
-
         } else {
-          userId = exists._id
+          userId = exists._id;
         }
 
         response.users.push({
@@ -48,7 +47,7 @@ if (Meteor.isServer) {
         });
       });
 
-      rooms.forEach(function(room) {
+      rooms.forEach(function (room) {
         const groupRoom = Chatter.addRoom({
           name: room.name,
           description: room.description,
@@ -62,7 +61,7 @@ if (Meteor.isServer) {
           ref: room.ref
         };
 
-        room.users.forEach(function(user) {
+        room.users.forEach(function (user) {
           const userCheck = Meteor.users.findOne({username: user});
           if (!userCheck) {
             throw new Meteor.Error("unknown-username", "username does not exist");
@@ -76,8 +75,7 @@ if (Meteor.isServer) {
           roomResp.users.push(user);
         });
 
-        response.rooms.push(roomResp)
-
+        response.rooms.push(roomResp);
       });
       return response;
     }
@@ -88,8 +86,8 @@ if (Meteor.isServer) {
       check(this.bodyParams, {
         name: String,
         description: String,
-        roomType: Match.Maybe(String, undefined),
-        ref: Match.Maybe(String, undefined)
+        roomType: Match.Maybe(Match.OneOf(String, null, undefined)),
+        ref: Match.Maybe(Match.OneOf(String, null, undefined))
       });
 
       return Chatter.addRoom({
@@ -119,8 +117,8 @@ if (Meteor.isServer) {
         username: String,
         password: String,
         admin: Match.Optional(Match.OneOf(Boolean, undefined)),
-        supportUser: Match.Maybe(String, undefined),
-        inClass: Match.Maybe(String, undefined)
+        supportUser: Match.Maybe(Match.OneOf(String, null, undefined)),
+        inClass: Match.Maybe(Match.OneOf(String, null, undefined))
       });
 
       const {username, password, admin, supportUser, inClass} = this.bodyParams;
@@ -138,7 +136,7 @@ if (Meteor.isServer) {
           "profile.inClass": inClass,
         }
       });
-      return userId
+      return userId;
     }
   });
 
@@ -202,11 +200,10 @@ if (Meteor.isServer) {
     post: function () {
       check(this.bodyParams, {
         username: String,
-        roomId: Match.Maybe(String, undefined),
-        ref: Match.Maybe(String, undefined)
+        roomId: Match.Maybe(String, undefined)
       });
 
-      const {username, roomId, ref} = this.bodyParams;
+      const {username, roomId} = this.bodyParams;
 
       const user = Meteor.users.findOne({username: username});
       if (!user) {

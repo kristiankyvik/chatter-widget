@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
-const emptyDatabase = function() {
+const emptyDatabase = function () {
   Chatter.User.remove({});
   Chatter.UserRoom.remove({});
   Chatter.Room.remove({});
@@ -9,12 +9,12 @@ const emptyDatabase = function() {
 };
 
 Meteor.methods({
-  "createTestUser"() {
+  "createTestUser" () {
     emptyDatabase();
 
     Accounts.createUser({
-      email : "kyvik_bcn@yahoo.es",
-      password : "banana"
+      email: "kyvik_bcn@yahoo.es",
+      password: "banana"
     });
 
     const meteorUser = Meteor.users.findOne();
@@ -25,12 +25,12 @@ Meteor.methods({
     });
   },
 
-  "createTestAdmin"() {
+  "createTestAdmin" () {
     emptyDatabase();
 
     Accounts.createUser({
-      email : "kyvik_bcn@yahoo.es",
-      password : "banana"
+      email: "kyvik_bcn@yahoo.es",
+      password: "banana"
     });
 
     const meteorUser = Meteor.users.findOne();
@@ -42,7 +42,7 @@ Meteor.methods({
     });
   },
 
-  "createTestRoom"() {
+  "createTestRoom" () {
     const roomId = Chatter.Room.insert({
       name: "Test Room",
       description: "This is the description of the test room"

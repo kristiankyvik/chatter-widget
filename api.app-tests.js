@@ -1,7 +1,5 @@
 import { emptyDatabase, callbackWrapper } from "./test-helpers.js";
 
-console.log("running intergration api tests");
-
 if (Meteor.isServer) {
   const body = {};
   let userId;
@@ -31,7 +29,6 @@ if (Meteor.isServer) {
 
     describe("and when the user creates a user account", function () {
       it("return error when passing wrong parameters", function (done) {
-
         body.data = {
           "name": "wronguser",
           "description": "wrongpassword"
@@ -44,7 +41,7 @@ if (Meteor.isServer) {
       });
 
       it("return token and user id when passing correct credentials", function (done) {
-        const userId = Meteor.users.findOne({username: "testuser"})._id;
+        userId = Meteor.users.findOne({username: "testuser"})._id;
 
         body.data = {
           "username": "testuser",
@@ -96,7 +93,11 @@ if (Meteor.isServer) {
       });
 
       describe("and when the /[setup] endpoint is hit with the right parameters", function () {
-        let u1, u2, r1, r2, r3;
+        let u1;
+        let u2;
+        let r1;
+        let r2;
+        let r3;
 
         before(function (done) {
           body.data = {
@@ -160,7 +161,7 @@ if (Meteor.isServer) {
           assert.isDefined(r3);
         });
 
-        it("users are aded to rooms correctly", function () {
+        it("users are added to rooms correctly", function () {
           const ur1 = Chatter.UserRoom.findOne({userId: u1._id, roomId: r1._id});
           const ur2 = Chatter.UserRoom.findOne({userId: u2._id, roomId: r2._id});
           const ur3 = Chatter.UserRoom.findOne({userId: u1._id, roomId: r3._id});
@@ -243,12 +244,7 @@ if (Meteor.isServer) {
           }));
         });
 
-        it("user are added correctly", function () {
-          const u1 = Meteor.users.findOne({username: "newuser1"});
-          assert.equal(u1.profile.isChatterUser, true);
-          assert.equal(u1.profile.chatterNickname, "newuser1");
-          assert.equal(u1.profile.isChatterAdmin, false);
-
+        it("user is added correctly", function () {
           const u2 = Meteor.users.findOne({username: "newuser2"});
           assert.equal(u2.profile.isChatterUser, true);
           assert.equal(u2.profile.chatterNickname, "newuser2");
@@ -256,13 +252,57 @@ if (Meteor.isServer) {
         });
       });
 
-      describe("and a room and user have been added", function () {
-        let roomId, userId;
+      describe("and /[setNickname] is called", function () {
+        it("/[setNickname] endpoint returns error when wrong parameters are sent", function (done) {
+          body.data = {
+            unallowedAttribute: "unallowed",
+            username: "testuser"
+          };
+
+          Meteor.http.call("POST", Meteor.absoluteUrl("api/setNickname"), body, callbackWrapper((error, response) => {
+            assert.equal(response.statusCode, 500);
+            done();
+          }));
+        });
+
+        it("/[setNickname] endpoint returns error when wrong unexistent username is sent", function (done) {
+          body.data = {
+            nickname: "new_nickname",
+            username: "fake_username"
+          };
+
+          Meteor.http.call("POST", Meteor.absoluteUrl("api/addUserToRoom"), body, callbackWrapper((error, response) => {
+            assert.equal(response.statusCode, 500);
+            done();
+          }));
+        });
+
+        it("/[setNickname] endpoint succeeds when right parameters are sent in", function (done) {
+          body.data = {
+            nickname: "new_nickname",
+            username: "testuser"
+          };
+
+          Meteor.http.call("POST", Meteor.absoluteUrl("api/setNickname"), body, callbackWrapper((error, response) => {
+            assert.equal(response.statusCode, 200);
+            done();
+          }));
+        });
+
+        it("nickname is actually updated", function () {
+          user = Meteor.users.findOne({username: "testuser"});
+          assert.equal(user.profile.chatterNickname, "new_nickname");
+        });
+      });
+
+      describe("and a room has been added", function () {
+        let roomId;
 
         before(function (done) {
           roomId = Chatter.addRoom({
             name: "testroom",
-            description: "testdescription"
+            description: "testdescription",
+            ref: "testreference"
           });
           done();
         });
@@ -271,7 +311,6 @@ if (Meteor.isServer) {
           body.data = {
             unallowedAttribute: "unallowed",
             username: "newuser",
-            roomId
           };
 
           Meteor.http.call("POST", Meteor.absoluteUrl("api/addUserToRoom"), body, callbackWrapper((error, response) => {
@@ -322,6 +361,42 @@ if (Meteor.isServer) {
             userId = Meteor.users.findOne({username: "newuser1"})._id;
             const ur = Chatter.UserRoom.findOne({userId, roomId});
             assert.isDefined(ur);
+          });
+        });
+
+        describe("and when the /[getRoom] is called", function () {
+          it("/[getRoom] endpoint returns error when wrong parameters are sent", function (done) {
+            body.data = {
+              unallowedAttribute: "unallowed"
+            };
+
+            Meteor.http.call("POST", Meteor.absoluteUrl("api/getRoom"), body, callbackWrapper((error, response) => {
+              assert.equal(response.statusCode, 500);
+              done();
+            }));
+          });
+
+          it("/[getRoom] endpoint returns error when wrong unexistent ref is sent", function (done) {
+            body.data = {
+              ref: "unexistent_ref",
+            };
+
+            Meteor.http.call("POST", Meteor.absoluteUrl("api/addUserToRoom"), body, callbackWrapper((error, response) => {
+              assert.equal(response.statusCode, 500);
+              done();
+            }));
+          });
+
+          it("/[getRoom] endpoint succeeds when right parameters are sent in", function (done) {
+            body.data = {
+              ref: "testreference"
+            };
+
+            Meteor.http.call("POST", Meteor.absoluteUrl("api/getRoom"), body, callbackWrapper((error, response) => {
+              assert.equal(response.statusCode, 200);
+              assert.equal(response.data, roomId);
+              done();
+            }));
           });
         });
 
