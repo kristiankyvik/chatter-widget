@@ -7,11 +7,14 @@ const fixtures = {
   }
 };
 
+let userIdOne;
+let roomId;
+
 module.exports = function () {
   this.Before( function () {
     server.execute(function () {
       Package['xolvio:cleaner'].resetDatabase();
-      Accounts.createUser({
+      userIdOne = Accounts.createUser({
         username: "testuser",
         password: "testuser"
       });
@@ -20,19 +23,13 @@ module.exports = function () {
 
   this.Given(/^I am logged in and have a chatter user$/, function () {
     server.execute( function () {
-      const userId = Meteor.users.findOne()._id;
-
-      Chatter.addUser({
-        userId
-      });
-
-      const roomId = Chatter.addRoom({
+      roomId = Chatter.addRoom({
         name: "Test Room",
         description: "this is a test room"
       });
 
       Chatter.addUserToRoom({
-        userId,
+        userId: userIdOne,
         roomId
       });
     });

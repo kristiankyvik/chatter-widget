@@ -1,7 +1,8 @@
 module.exports = function () {
-  this.Before( function () {
+  let userIdTwo;
+  this.Before(function () {
     server.execute(function () {
-      Accounts.createUser({
+      userIdTwo = Accounts.createUser({
         username: "testuser2",
         password: "testuser2"
       });
@@ -9,19 +10,9 @@ module.exports = function () {
   });
 
   this.Given(/^some messages have been written$/, function () {
-    server.execute( function () {
-      const userIdTwo = Meteor.users.findOne({username: "testuser2"})._id;
-      const userIdOne = Meteor.users.findOne({username: "testuser"})._id;
-
-      const cu1 = Chatter.User.findOne({userId: userIdOne});
-
-      const cu2Id = Chatter.addUser({
-        userId: userIdTwo
-      });
-
-      const cu2 = Chatter.User.findOne(cu2Id);
-
-      const roomId = Chatter.Room.findOne()._id;
+    server.execute(function () {
+      const cu1 = Meteor.users.findOne(userIdOne);
+      const cu2 = Meteor.users.findOne(userIdTwo);
 
       Chatter.addUserToRoom({
         userId: userIdTwo,
