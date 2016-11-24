@@ -1,19 +1,17 @@
-module.exports = function() {
-
-  this.Before( function() {
+module.exports = function () {
+  this.Before( function () {
     server.execute(function () {
       Accounts.createUser({
-        username : "testuser2",
-        password : "testuser2"
+        username: "testuser2",
+        password: "testuser2"
       });
-
     });
   });
 
   this.Given(/^some messages have been written$/, function () {
-    server.execute( function() {
-      const userIdTwo =  Meteor.users.findOne({username: "testuser2"})._id;
-      const userIdOne =  Meteor.users.findOne({username: "testuser"})._id;
+    server.execute( function () {
+      const userIdTwo = Meteor.users.findOne({username: "testuser2"})._id;
+      const userIdOne = Meteor.users.findOne({username: "testuser"})._id;
 
       const cu1 = Chatter.User.findOne({userId: userIdOne});
 
@@ -33,9 +31,6 @@ module.exports = function() {
       var today = new Date();
 
       today.setDate(today.getDate() - 1);
-
-      console.log(today);
-
 
       new Chatter.Message({
         message: "message",
@@ -77,8 +72,6 @@ module.exports = function() {
         avatar: cu2.avatar,
         nickname: cu2.nickname
       }).save();
-
     });
-
   });
 };

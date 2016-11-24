@@ -5,27 +5,24 @@ const fixtures = {
       Meteor.loginWithPassword(user.username, user.password, done);
     }, user);
   }
-}
+};
 
-module.exports = function() {
-  this.Before( function() {
+module.exports = function () {
+  this.Before( function () {
     server.execute(function () {
       Package['xolvio:cleaner'].resetDatabase();
       Accounts.createUser({
-        username : "testuser",
-        password : "testuser"
+        username: "testuser",
+        password: "testuser"
       });
-
     });
   });
 
-
   this.Given(/^I am logged in and have a chatter user$/, function () {
-
-    server.execute( function() {
+    server.execute( function () {
       const userId = Meteor.users.findOne()._id;
 
-      const chatterUserId = Chatter.addUser({
+      Chatter.addUser({
         userId
       });
 
