@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function () {
   this.When(/^I click on the widget it should expand$/, function () {
     browser.click(".chatter-open");
     expect(browser.waitForExist("#chatter", 2000)).toBe(true);

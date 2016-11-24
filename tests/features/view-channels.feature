@@ -1,4 +1,3 @@
-@watch
 Feature: View channels
 As a chatter user,
 so that I can get interact with the chat,
