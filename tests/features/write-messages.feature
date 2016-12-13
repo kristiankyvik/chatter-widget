@@ -11,3 +11,5 @@ Background:
 Scenario: User writes messages in the room
   Then I should see the chat room ui
   When I write messages they should appear
+  And when I go back to the room list
+  Then I should see my message and my avatar
