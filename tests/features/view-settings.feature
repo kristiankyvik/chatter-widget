@@ -10,3 +10,5 @@ Background:
 
 Scenario: User goes to the settings page
   Then I should see my settings
+  When I click on close I should see the rooms
+
