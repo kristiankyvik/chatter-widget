@@ -1,3 +1,4 @@
+@watch
 Feature: View channels
 As a chatter user,
 so that I can get interact with the chat,
@@ -10,3 +11,4 @@ Scenario: User visits a room
   Then I should see the chat widget
   When I click on the widget it should expand
   And I should see the room I created
+  When I click on active channels, the list should minimize
