@@ -1,5 +1,5 @@
 String.prototype.startsWith = function (needle) {
-    return(this.indexOf(needle) === 0);
+  return(this.indexOf(needle) === 0);
 };
 
 module.exports = function () {
