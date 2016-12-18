@@ -1,10 +1,11 @@
 module.exports = function () {
   this.Then(/^I should see the chat room ui$/, function () {
+
     const doesExist = browser.waitForExist(".roomWrapper", 2000);
     expect(doesExist).toBe(true);
     expect(browser.getText(".header .status span")).toEqual("Test Room");
     const msgArray = ["message", "message", "message", "message", "message"];
-    expect(browser.getText(".chatter-msg.comment .text")).toEqual(msgArray);
+    expect(browser.getText(".chatter-msg .text")).toEqual(msgArray);
 
     // check message written by my user
     const myNickname = browser.elements(".nickname").value[0].ELEMENT;

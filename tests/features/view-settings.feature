@@ -1,3 +1,4 @@
+@watch
 Feature: View Settings
 As a chatter user,
 so that I can see my information,
