@@ -141,12 +141,10 @@ if (Meteor.isServer) {
           u2 = Meteor.users.findOne({username: "user2"});
 
           assert.isDefined(u1);
-          assert.equal(u1.profile.isChatterUser, true);
           assert.equal(u1.profile.chatterNickname, "user1");
           assert.equal(u1.profile.isChatterAdmin, false);
 
           assert.isDefined(u2);
-          assert.equal(u2.profile.isChatterUser, true);
           assert.equal(u2.profile.chatterNickname, "user2");
           assert.equal(u2.profile.isChatterAdmin, true);
         });
@@ -246,7 +244,6 @@ if (Meteor.isServer) {
 
         it("user is added correctly", function () {
           const u2 = Meteor.users.findOne({username: "newuser2"});
-          assert.equal(u2.profile.isChatterUser, true);
           assert.equal(u2.profile.chatterNickname, "newuser2");
           assert.equal(u2.profile.isChatterAdmin, true);
         });
