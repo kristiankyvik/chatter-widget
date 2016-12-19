@@ -39,16 +39,15 @@ module.exports = function () {
     const doesExist = browser.waitForExist(".scrollable", 2000);
     expect(doesExist).toBe(true);
     browser.pause(2000);
-    browser.click(".scrollable");
-    for (var i = 0; i < 350; i++) {
-      browser.keys("ArrowUp");
-    }
     const messages = browser.elements(".chatter-msg .text").value;
     expect(messages.length).toEqual(100);
   });
 
   this.When(/^I scroll up$/, function () {
-    browser.scroll(".scrollable", 100, 600);
+    browser.click(".scrollable");
+    for (var i = 0; i < 400; i++) {
+      browser.keys("ArrowUp");
+    }
     browser.pause(4000);
   });
 

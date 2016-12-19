@@ -135,7 +135,7 @@ if (Meteor.isServer) {
           "profile.supportUser": supportUser,
           "profile.inClass": inClass,
         }
-      });
+        });
       return userId;
     }
   });

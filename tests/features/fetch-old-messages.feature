@@ -1,4 +1,3 @@
-@watch
 Feature: Fetch old messages
 As a chatter user,
 so that I can see old messages,
