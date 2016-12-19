@@ -1,4 +1,3 @@
-@watch
 Feature: Add room
 As a chatter user,
 so that I can interact with others,

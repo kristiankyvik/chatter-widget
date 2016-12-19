@@ -1,4 +1,3 @@
-@watch
 Feature: View room settings
 As a chatter user,
 so that I can view the settings of a room,

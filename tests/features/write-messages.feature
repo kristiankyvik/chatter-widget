@@ -1,4 +1,3 @@
-@watch
 Feature: Write messages
 As a chatter user,
 so that I can get communicate with others,

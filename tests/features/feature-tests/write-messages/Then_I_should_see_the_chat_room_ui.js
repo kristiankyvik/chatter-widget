@@ -5,6 +5,7 @@ module.exports = function () {
     expect(doesExist).toBe(true);
     expect(browser.getText(".header .status span")).toEqual("Test Room");
     const msgArray = ["message", "message", "message", "message", "message"];
+    browser.pause(4000);
     expect(browser.getText(".chatter-msg .text")).toEqual(msgArray);
 
     // check message written by my user
