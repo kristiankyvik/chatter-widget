@@ -52,13 +52,16 @@ localstorage@1.0.12
 logging@1.1.16
 meteor@1.6.0
 meteor-base@1.0.4
+meteorhacks:kadira@2.30.3
+meteorhacks:meteorx@1.4.1
 meteorhacks:subs-manager@1.1.0
 meteortoys:toykit@2.2.1
 minifier-css@1.2.14
 minifier-js@1.2.15
 minifiers@1.1.7
 minimongo@1.0.18
-mizzao:user-status@0.1.7
+mizzao:timesync@0.4.0
+mizzao:user-status@0.6.6
 mobile-experience@1.0.4
 mobile-status-bar@1.0.12
 modules@0.7.7
@@ -66,6 +69,7 @@ modules-runtime@0.7.7
 momentjs:moment@2.8.4
 mongo@1.1.14
 mongo-id@1.0.6
+mongo-livedata@1.0.12
 mquandalle:jade@0.4.9
 mquandalle:jade-compiler@0.4.5
 mquandalle:stylus@1.0.10

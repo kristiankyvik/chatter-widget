@@ -1,9 +1,12 @@
 {
   "galaxy.meteor.com": {
      "env": {
-       "ROOT_URL": "http://chatter-widget.meteorapp.com",
-       "MONGO_URL": "mongodb://chatterWidgetAdmin:chatterWidgetAdmin@ds019796.mlab.com:19796/chatter_widget"
+       "ROOT_URL": "http://chatter-eu.meteorapp.com",
+       "MONGO_URL": "mongodb://chatter:ChatTilYouDie@ds117189.mlab.com:17189/chatter-eu"
      }
+   },
+  "kadira": {
+    "appId": "hRy36WbZ9MyoczBS5",
+    "appSecret": "6d49d420-244e-4a9d-809b-939094c32b87"
    }
 }
-
