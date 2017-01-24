@@ -53,6 +53,7 @@ logging@1.1.16
 meteor@1.6.0
 meteor-base@1.0.4
 meteorhacks:kadira@2.30.3
+meteorhacks:meteor-down@1.1.2
 meteorhacks:meteorx@1.4.1
 meteorhacks:subs-manager@1.1.0
 meteortoys:toykit@2.2.1

@@ -1,8 +1,9 @@
 {
   "galaxy.meteor.com": {
      "env": {
-       "ROOT_URL": "http://chatter-eu.meteorapp.com",
-       "MONGO_URL": "mongodb://chatter:ChatTilYouDie@ds117189.mlab.com:17189/chatter-eu"
+       "ROOT_URL": "http://chatter.eu.meteorapp.com",
+       "MONGO_URL": "mongodb://chatter:ChatTilYouDie@ds129599-a0.mlab.com:29599,ds129599-a1.mlab.com:29599/chatter_db?replicaSet=rs-ds129599",
+       "METEOR_DOWN_KEY": "jlj34l5k4j35ljk43lDk5j"
      }
    },
   "kadira": {
