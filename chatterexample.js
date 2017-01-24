@@ -109,7 +109,13 @@ if (Meteor.isClient) {
         // Attempts to login to the chatter app given credentials
       case "login-chatter":
         console.log("[CHATTER]: attempting to log in to Chatter");
-        Meteor.loginWithPassword(e.data.username, e.data.password);
+        Meteor.loginWithPassword(e.data.username, e.data.password, function(err) {
+          if (err) {
+            console.log("[CHATTER]: error detected at login");
+            console.log(err);
+          }
+        });
+
         break;
         // Log out of the chatter app
       case "logout-chatter":
